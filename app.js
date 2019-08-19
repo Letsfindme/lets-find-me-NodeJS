@@ -49,8 +49,11 @@ app.use(bodyParser.json());
 app.use(
     multer({
         storage: fileStorage,
-        fileFilter: fileFilter
-    }).single('image')
+        fileFilter: fileFilter,
+        limits:{
+            fileSize: 1000 * 1000 * 2
+        }
+    }).array('image')
 );
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use((req, res, next) => {
