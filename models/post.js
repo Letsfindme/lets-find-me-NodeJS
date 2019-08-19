@@ -15,6 +15,7 @@ const Post = sequelize.define('post', {
   creationDate: Sequelize.DATE,
   imageUrl: Sequelize.STRING,
   content: Sequelize.STRING,
+  author: Sequelize.STRING
 
   // @OneToMany(cascade = CascadeType.REMOVE)
   // @JoinColumn(name = "comments")
