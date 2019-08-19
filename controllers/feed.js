@@ -1,23 +1,28 @@
 const fs = require('fs');
 const path = require('path');
 
-const { validationResult } = require('express-validator/check');
+const {
+  validationResult
+} = require('express-validator/check');
 
 const Post = require('../models/post');
 const User = require('../models/user');
+const Image = require('../models/image')
 
 exports.getPosts = (req, res, next) => {
   const currentPage = req.query.page || 1;
+  console.log('currentPage currentPagecurrentPagecurrentPage', currentPage);
+
   const perPage = 2;
   let totalItems;
-  Post.find()
-    .countDocuments()
-    .then(count => {
-      totalItems = count;
-      return Post.find()
-        .skip((currentPage - 1) * perPage)
-        .limit(perPage);
-    })
+  Post.findAll()
+    // .countDocuments()
+    // .then(count => {
+    //   totalItems = count;
+    //   return Post.find()
+    //     .skip((currentPage - 1) * perPage)
+    //     .limit(perPage);
+    // })
     .then(posts => {
       res.status(200).json({
         message: 'Fetched posts successfully.',
@@ -33,6 +38,9 @@ exports.getPosts = (req, res, next) => {
     });
 };
 
+/*
+* Create a new post with photos
+*/
 exports.createPost = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -40,36 +48,48 @@ exports.createPost = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
-  if (!req.file) {
+  // !req.file || 
+  if (!req.files[0]) {
+    console.log(req.files);
     const error = new Error('No image provided.');
     error.statusCode = 422;
     throw error;
   }
-  const imageUrl = req.file.path;
+  //const imageUrl = req.file.path;
   const title = req.body.title;
   const content = req.body.content;
-  let creator;
+  let auther;
+  User.findByPk(req.userId)
+  .then(user => 
+    auther = user.username)
   const post = new Post({
     title: title,
     content: content,
-    imageUrl: imageUrl,
-    creator: req.userId
+    //imageUrl: imageUrl,
+    userId: req.userId,
+    auther: auther
   });
+  let postId="";
   post
     .save()
-    .then(result => {
-      return User.findByPk(req.userId);
-    })
-    .then(user => {
-      creator = user;
-      user.posts.push(post);
-      return user.save();
-    })
+    .then(savedPost =>{
+      postId = savedPost.id,
+      console.log('savedPost.id',savedPost.id);
+      
+      })
+    .then(req.files.map(file => {
+      let image = new Image({
+        imageRef: file.path,
+      });
+      console.log('file.path',file.path)
+      image.save()
+    }))
     .then(result => {
       res.status(201).json({
         message: 'Post created successfully!',
         post: post,
-        creator: { _id: creator._id, name: creator.name }
+        userId: req.userId,
+        auther: auther
       });
     })
     .catch(err => {
@@ -89,7 +109,10 @@ exports.getPost = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
-      res.status(200).json({ message: 'Post fetched.', post: post });
+      res.status(200).json({
+        message: 'Post fetched.',
+        post: post
+      });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -99,6 +122,9 @@ exports.getPost = (req, res, next) => {
     });
 };
 
+/*
+* update exesting post
+*/
 exports.updatePost = (req, res, next) => {
   const postId = req.params.postId;
   const errors = validationResult(req);
@@ -139,7 +165,10 @@ exports.updatePost = (req, res, next) => {
       return post.save();
     })
     .then(result => {
-      res.status(200).json({ message: 'Post updated!', post: result });
+      res.status(200).json({
+        message: 'Post updated!',
+        post: result
+      });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -175,7 +204,9 @@ exports.deletePost = (req, res, next) => {
       return user.save();
     })
     .then(result => {
-      res.status(200).json({ message: 'Deleted post.' });
+      res.status(200).json({
+        message: 'Deleted post.'
+      });
     })
     .catch(err => {
       if (!err.statusCode) {
