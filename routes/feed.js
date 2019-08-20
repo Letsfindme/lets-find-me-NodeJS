@@ -26,6 +26,12 @@ router.post(
 
 router.get('/post/:postId', isAuth, feedController.getPost);
 
+/**
+ * Get Top noted feeds for home
+ * /feed/topfeed
+ */
+router.get("/topfeed", feedController.getTopFeed);
+
 router.put(
   '/post/:postId',
   isAuth,
