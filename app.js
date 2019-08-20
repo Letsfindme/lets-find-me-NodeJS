@@ -7,6 +7,7 @@ const path = require('path');
 const userRoute = require('./routes/user')
 const sequelize = require('./util/database');
 const feedRoutes = require('./routes/feed');
+const topfeed = require('./routes/topfeed');
 const authRoutes = require('./routes/auth');
 const Address = require('./models/address');
 const Post = require('./models/post');
@@ -102,8 +103,9 @@ PostRate.belongsTo(User, {
     constraints: true,
     onDelete: 'CASCADE'
 })
-Post.hasMany(PostContent)
-PostContent.hasMany(Image)
+Post.hasMany(Image)
+//PostContent.hasMany(Image)
+Image.belongsTo(Post)
 
 Cart.belongsTo(User, {
     constraints: true,
