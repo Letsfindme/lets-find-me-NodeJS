@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-
 const {
   validationResult
 } = require('express-validator/check');
@@ -16,13 +15,6 @@ exports.getPosts = (req, res, next) => {
   const perPage = 2;
   let totalItems;
   Post.findAll()
-    // .countDocuments()
-    // .then(count => {
-    //   totalItems = count;
-    //   return Post.find()
-    //     .skip((currentPage - 1) * perPage)
-    //     .limit(perPage);
-    // })
     .then(posts => {
       res.status(200).json({
         message: 'Fetched posts successfully.',
@@ -39,8 +31,8 @@ exports.getPosts = (req, res, next) => {
 };
 
 /*
-* Create a new post with photos
-*/
+ * Create a new post with photos
+ */
 exports.createPost = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -48,43 +40,42 @@ exports.createPost = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
-  // !req.file || 
   if (!req.files[0]) {
-    console.log(req.files);
     const error = new Error('No image provided.');
     error.statusCode = 422;
     throw error;
   }
-  //const imageUrl = req.file.path;
   const title = req.body.title;
   const content = req.body.content;
   let auther;
   User.findByPk(req.userId)
-  .then(user => 
-    auther = user.username)
-  const post = new Post({
-    title: title,
-    content: content,
-    //imageUrl: imageUrl,
-    userId: req.userId,
-    auther: auther
-  });
-  let postId="";
-  post
-    .save()
-    .then(savedPost =>{
-      postId = savedPost.id,
-      console.log('savedPost.id',savedPost.id);
-      
-      })
-    .then(req.files.map(file => {
-      let image = new Image({
-        imageRef: file.path,
-      });
-      console.log('file.path',file.path)
-      image.save()
-    }))
-    .then(result => {
+    .then(user =>
+      auther = user.username)
+  Post.create({
+      title: title,
+      content: content,
+      userId: req.userId,
+      auther: auther,
+      imageUrl: req.files[0].path
+    })
+    .then(post => {
+      req.files.map(file => {
+          Image.create({
+            imageRef: file.path,
+          }).then(image => {
+            image.setPost(post)
+          })
+        })
+        // ,
+        // Post.update({
+        //   imageUrl: req.files[0].path
+        // }, {
+        //   where: {
+        //     id: post.id
+        //   }
+        // })
+    })
+    .then(post => {
       res.status(201).json({
         message: 'Post created successfully!',
         post: post,
@@ -102,7 +93,12 @@ exports.createPost = (req, res, next) => {
 
 exports.getPost = (req, res, next) => {
   const postId = req.params.postId;
-  Post.findByPk(postId)
+  Post.findByPk(postId, {
+      include: [{
+        model: Image,
+        attributes: ['imageRef']
+      }]
+    })
     .then(post => {
       if (!post) {
         const error = new Error('Could not find post.');
@@ -122,9 +118,30 @@ exports.getPost = (req, res, next) => {
     });
 };
 
+/**
+ * Get Top noted feeds for home
+ */
+exports.getTopFeed = (req, res, next) => {
+  Post.findAll({
+      limit: 4
+    })
+    .then(posts => {
+      res.status(200).json({
+        message: 'Fetched top posts successfully.',
+        posts: posts
+      });
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
 /*
-* update exesting post
-*/
+ * update exesting post
+ */
 exports.updatePost = (req, res, next) => {
   const postId = req.params.postId;
   const errors = validationResult(req);
