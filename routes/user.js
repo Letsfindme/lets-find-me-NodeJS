@@ -3,8 +3,17 @@ const path = require('path');
 const express = require('express');
 
 const adminController = require('../controllers/admin');
+const userController = require('../controllers/user');
+const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
+
+// /admin/add-product => GET
+router.get('/profile',isAuth, userController.getProfile);
+router.post('/profile',isAuth, userController.updateProfile);
+router.post('/profile/address',isAuth, userController.updateAdresse);
+router.post('/profile/avatar',isAuth, userController.postAvatar);
+router.get('/profile/avatar',isAuth, userController.getAvatar);
 
 // /admin/add-product => GET
 router.get('/add-product', adminController.getAddProduct);
