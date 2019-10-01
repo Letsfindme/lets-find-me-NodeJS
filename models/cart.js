@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize');
 
 const sequelize = require('../util/database');
+const Product = require('./product');
+const CartItem = require('./cart-item');
 
 const Cart = sequelize.define('cart', {
   id: {
@@ -10,5 +12,7 @@ const Cart = sequelize.define('cart', {
     primaryKey: true
   }
 });
-
+// Cart.belongsToMany(Product, {
+//   through: CartItem
+// });
 module.exports = Cart;
