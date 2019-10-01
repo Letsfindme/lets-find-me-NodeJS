@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 
 const sequelize = require('../util/database');
+const Post = require('./post');
 
 const Image = sequelize.define('Image', {
   id: {
@@ -12,5 +13,5 @@ const Image = sequelize.define('Image', {
   imageRef: Sequelize.STRING,
   
 });
-
+// Image.belongsTo(Post)
 module.exports = Image;
