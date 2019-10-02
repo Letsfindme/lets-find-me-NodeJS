@@ -142,7 +142,25 @@ exports.getPost = (req, res, next) => {
         model: Image,
         attributes: ["imageRef"]
       },
-      { model: Comment, include: [{ model: User, attributes: ["username"] }] }
+      {
+        model: User,
+        attributes: ["username"],
+        include: [
+          {
+            model: Avatar,
+            attributes: ["imageRef"]
+          }
+        ]
+      },
+      {
+        model: Comment,
+        include: [
+          {
+            model: User,
+            attributes: ["username"]
+          }
+        ]
+      }
     ]
   })
     .then(post => {
