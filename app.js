@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const express = require("express");
+const morgan = require('morgan');
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
@@ -41,6 +42,8 @@ const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "image/png" ||
     file.mimetype === "image/jpg" ||
+    file.mimetype === "image/icon" ||
+    file.mimetype === "image/vnd.microsoft.icon" ||
     file.mimetype === "image/jpeg"
   ) {
     cb(null, true);
@@ -52,6 +55,7 @@ const fileFilter = (req, file, cb) => {
 ////////////////////////////////////////     Router     ////////////////////////////////////
 //Enables Parse json on the body of request
 app.use(bodyParser.json());
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 app.use(
   multer({
     storage: fileStorage,
@@ -100,19 +104,25 @@ User.hasOne(Avatar);
 //User.hasOne(Avatar);
 Avatar.belongsTo(User);
 Post.belongsTo(User, {
+  through: PostRate,
   onDelete: "CASCADE"
 });
+User.belongsToMany(Post, { through: PostRate });
+
 //User.hasMany(Post); //One-to-many
 
-PostRate.belongsTo(Post, {
-  constraints: true,
-  onDelete: "CASCADE"
-});
-Post.hasMany(PostRate);
-PostRate.belongsTo(User, {
-  constraints: true,
-  onDelete: "CASCADE"
-});
+// PostRate.belongsTo(Post, {
+//   constraints: true,
+//   onDelete: "CASCADE"
+// });
+
+// Post.hasMany(PostRate);
+// PostRate.belongsTo(User, {
+//   constraints: true,
+//   onDelete: "CASCADE"
+// });
+
+// , { through: PostRate }
 
 Post.hasMany(PostComment);
 PostComment.belongsTo(User, {

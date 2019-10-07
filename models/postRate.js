@@ -6,12 +6,12 @@ const User = require('./user');
 const Post = require('./post');
 
 const PostRate = sequelize.define('postRate', {
-  id: {
-    type: Sequelize.UUID,
-    allowNull: false,
-    primaryKey: true,
-    defaultValue: Sequelize.UUIDV4
-  },
+  // id: {
+  //   type: Sequelize.UUID,
+  //   allowNull: false,
+  //   primaryKey: true,
+  //   defaultValue: Sequelize.UUIDV4
+  // },
   rate: Sequelize.INTEGER,
 });
 

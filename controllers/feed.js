@@ -7,6 +7,7 @@ const User = require("../models/user");
 const Image = require("../models/image");
 const Comment = require("../models/postComment");
 const Avatar = require("../models/avatar");
+const PostRate = require("../models/postRate");
 
 exports.getPosts = (req, res, next) => {
   const currentPage = req.query.page || 1;
@@ -42,8 +43,6 @@ exports.addComment = (req, res, next) => {
     throw error;
   }
   const comment = req.body.text;
-  console.log(req.body.text);
-
   let imageRef;
   User.findByPk(req.userId, {
     include: [
@@ -62,12 +61,59 @@ exports.addComment = (req, res, next) => {
         postId: postId
       })
     )
-    .then(comment => { })
+    .then(comment => {})
     .then(comment => {
       res.status(201).json({
         message: "Comment created successfully!",
         comment: comment,
         userId: req.userId
+      });
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+/*
+ * Add rating to exesting post
+ */
+exports.addRate = (req, res, next) => {
+  const errors = validationResult(req);
+  const postId = req.params.postId;
+  const rate = req.params.postRate;
+  if (!errors.isEmpty()) {
+    const error = new Error("Validation failed, entered data is incorrect.");
+    error.statusCode = 422;
+    throw error;
+  }
+  // postId = Post.findByPk(postId).then(post => {
+  //   return post.id;
+  // });
+  PostRate.findOne({
+    where: {
+      postId: postId,
+      userId: req.userId
+    }
+  })
+    .then(postRate => {
+      if (postRate) {
+        return postRate.update({
+          rate: rate
+        });
+      } else {
+        return PostRate.create({
+          postId: postId,
+          userId: req.userId,
+          rate: rate
+        });
+      }
+    })
+    .then(postRate => {
+      res.status(201).json({
+        message: "Rate added successfully!",
+        postRate: postRate
       });
     })
     .catch(err => {
@@ -188,8 +234,8 @@ exports.getPost = (req, res, next) => {
 exports.getTopFeed = (req, res, next) => {
   // var t5 = mydata.slice(0,5);
   Post.findAll({
-    limit: 4
-    , include: [
+    limit: 4,
+    include: [
       {
         model: Image,
         attributes: ["imageRef"]
