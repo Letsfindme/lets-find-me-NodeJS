@@ -15,7 +15,7 @@ exports.signup = (req, res, next) => {
     throw error;
   }
   const email = req.body.email;
-  const name = req.body.name;
+  const username = req.body.username;
   const password = req.body.password;
   bcrypt
     .hash(password, 12)
@@ -23,7 +23,7 @@ exports.signup = (req, res, next) => {
       const user = new User({
         email: email,
         password: hashedPw,
-        name: name
+        username: username
       });
       return user.save();
     })
@@ -46,18 +46,18 @@ exports.login = (req, res, next) => {
   const password = req.body.password;
   let loadedUser;
   User.findAll({
-      where: {
-        email: email
-      }
-    }).then(user => {
-      if (!user[0]) {
-        const error = new Error('A user with this email could not be found.');
-        error.statusCode = 401;
-        throw error;
-      }
-      loadedUser = user[0];
-      return bcrypt.compare(password, user[0].password);
-    })
+    where: {
+      email: email
+    }
+  }).then(user => {
+    if (!user[0]) {
+      const error = new Error('A user with this email could not be found.');
+      error.statusCode = 401;
+      throw error;
+    }
+    loadedUser = user[0];
+    return bcrypt.compare(password, user[0].password);
+  })
     .then(isEqual => {
       if (!isEqual) {
         const error = new Error('Wrong password!');
@@ -65,12 +65,12 @@ exports.login = (req, res, next) => {
         throw error;
       }
       const token = jwt.sign({
-          email: loadedUser.email,
-          userId: loadedUser.id.toString()
-        },
+        email: loadedUser.email,
+        userId: loadedUser.id.toString()
+      },
         'let$f!ndsomesupersecre+secre+', {
-          expiresIn: '240h'
-        }
+        expiresIn: '240h'
+      }
       );
       res.status(200).json({
         token: token,

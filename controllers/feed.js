@@ -62,7 +62,7 @@ exports.addComment = (req, res, next) => {
         postId: postId
       })
     )
-    .then(comment => {})
+    .then(comment => { })
     .then(comment => {
       res.status(201).json({
         message: "Comment created successfully!",
@@ -142,7 +142,25 @@ exports.getPost = (req, res, next) => {
         model: Image,
         attributes: ["imageRef"]
       },
-      { model: Comment, include: [{ model: User, attributes: ["username"] }] }
+      {
+        model: User,
+        attributes: ["username"],
+        include: [
+          {
+            model: Avatar,
+            attributes: ["imageRef"]
+          }
+        ]
+      },
+      {
+        model: Comment,
+        include: [
+          {
+            model: User,
+            attributes: ["username"]
+          }
+        ]
+      }
     ]
   })
     .then(post => {
@@ -171,6 +189,22 @@ exports.getTopFeed = (req, res, next) => {
   // var t5 = mydata.slice(0,5);
   Post.findAll({
     limit: 4
+    , include: [
+      {
+        model: Image,
+        attributes: ["imageRef"]
+      },
+      {
+        model: User,
+        attributes: ["username"],
+        include: [
+          {
+            model: Avatar,
+            attributes: ["imageRef"]
+          }
+        ]
+      }
+    ]
   })
     .then(posts => {
       res.status(200).json({
