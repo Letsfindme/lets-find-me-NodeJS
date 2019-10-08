@@ -52,23 +52,30 @@ exports.addComment = (req, res, next) => {
             }
         ]
     })
-        .then(user => (imageRef = user.Avatar.imageRef))
-        .then(imageRef =>
-            Comment.create({
-                text: comment,
-                imageRef: imageRef,
-                userId: req.userId,
-                postId: postId
-            })
+        .then(user => {
+                return Comment.create({
+                    text: comment,
+                    imageRef: user.Avatar.imageRef,
+                    userId: req.userId,
+                    postId: postId
+                })
+            }
         )
         .then(comment => {
-        })
-        .then(comment => {
-            res.status(201).json({
-                message: "Comment created successfully!",
-                comment: comment,
-                userId: req.userId
-            });
+            Comment.findByPk(comment.id, {
+                    include: [
+                        {
+                            model: User,
+                            attributes: ["username"]
+                        }
+                    ]
+                }
+            ).then(comment => {
+                res.status(201).json({
+                    message: "Comment created successfully!",
+                    comment: comment
+                })
+            })
         })
         .catch(err => {
             if (!err.statusCode) {
