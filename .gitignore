@@ -6,3 +6,5 @@ node_modules
 images/
 
 package-lock.json
+
+.vscode/settings.json
