@@ -54,8 +54,8 @@ export default function(server) {
     });
   });
 
-  //todo
-  server.use(authentication);
+  //todo if you want to intercept all connection 
+  //server.use(authentication);
 
   //filter file type
   const fileFilter = (req, file, cb) => {

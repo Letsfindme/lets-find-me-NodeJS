@@ -1,21 +1,22 @@
 // Imports
-import jwt from 'jsonwebtoken'
-import serverConfig from '../config/server.json'
+import jwt from "jsonwebtoken";
+import serverConfig from "../config/server.json";
 
 // Authentication middleware
-module.exports =  (request, response, next)=> {
-  let authToken = request.headers.authorization
-
+module.exports = (request, response, next) => {
+  let authToken = request.headers.authorization;
   if (authToken && authToken !== null) {
     try {
-      const token = authToken.split(' ')
-      request.user = jwt.verify(token[1], serverConfig.secret)
+      const token = authToken.split(" ");
+      request.user = jwt.verify(token[1], serverConfig.secret);
     } catch (e) {
-      console.warn('Invalid token detected.')
+      console.warn("Invalid token detected.");
+      const error = new Error("Not authenticated.");
+      error.statusCode = 401;
+      throw error;
     }
   } else {
-    request.user = {}
+    request.user = {};
   }
-
-  next()
-}
+  next();
+};
