@@ -1,8 +1,8 @@
 {
   "development": {
-    "username": "root",
-    "password": "Quadband2100",
-    "database": "crate",
+    "username": "letsfind",
+    "password": "letsfind",
+    "database": "app",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "seederStorage": "sequelize"
