@@ -56,11 +56,9 @@ exports.getProfile = (req, res, next) => {
         const error = new Error("Not found.");
         error.statusCode = 404;
         throw error;
-      } else if (!user.addresses.length > 0) {
+      } else if (user.addresses.length < 1) {
         user["addresses"] = undefined;
-        console.log(user);
       }
-
       res.status(200).json({
         user: user
       });
