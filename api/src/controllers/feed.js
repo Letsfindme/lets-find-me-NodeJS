@@ -176,6 +176,7 @@ module.exports = {
         return models.Post.create({
           title: title,
           content: content,
+          category: req.body.category,
           userId: user.id,
           author: user.username,
           imageUrl: req.files[0].path
