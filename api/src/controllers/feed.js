@@ -142,15 +142,7 @@ module.exports = {
    * Create new post
    */
   createPost: async (req, res, next) => {
-    const location = JSON.parse(req.body.location)
-    console.log("location postData.location", req.body.location);
-    console.log("location postData.location.address", location.coordinates);
-    const test = {
-      value: "35 Terrasse de l'Université, Nanterre, France",
-      address: "35 Terrasse de l'Université, Nanterre, France",
-      coordinates: { lat: 48.89941340000001, lng: 2.2142138000000386 }
-    };
-
+    const location = JSON.parse(req.body.location);
     const addressArray = location.address.split(",");
     const address = await models.Address.create({
       street: addressArray[0],
@@ -234,6 +226,10 @@ module.exports = {
         {
           model: models.Image,
           attributes: ["imageRef"]
+        },
+        {
+          model: models.Address,
+          attributes: ["city", "country", "lang", "lat"]
         },
         {
           model: models.User,
