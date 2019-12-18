@@ -10,6 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     street: DataTypes.STRING,
     city: DataTypes.STRING,
     country: DataTypes.STRING,
+    lat: DataTypes.STRING,
+    lang: DataTypes.STRING,
     postcode: DataTypes.INTEGER
   });
 

@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const Post = sequelize.define("post", {
     id: {
@@ -16,8 +15,12 @@ module.exports = (sequelize, DataTypes) => {
     author: DataTypes.STRING
   });
 
-  Post.associate = (models) => {
+  Post.associate = models => {
     Post.belongsTo(models.User, {
+      constraints: true,
+      onDelete: "CASCADE"
+    });
+    Post.belongsTo(models.Address, {
       constraints: true,
       onDelete: "CASCADE"
     });

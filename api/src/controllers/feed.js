@@ -93,8 +93,8 @@ module.exports = {
   /*
    * Add rating to exesting post
    */
-  addRate: (req, res, next) => {
-    const errors = validationResult(req);
+  addRate: async (req, res, next) => {
+    const errors = await validationResult(req);
     const postId = req.params.postId;
     const rate = req.params.postRate;
     if (!errors.isEmpty()) {
@@ -141,7 +141,26 @@ module.exports = {
   /*
    * Create new post
    */
-  createPost: (req, res, next) => {
+  createPost: async (req, res, next) => {
+    const location = JSON.parse(req.body.location)
+    console.log("location postData.location", req.body.location);
+    console.log("location postData.location.address", location.coordinates);
+    const test = {
+      value: "35 Terrasse de l'Université, Nanterre, France",
+      address: "35 Terrasse de l'Université, Nanterre, France",
+      coordinates: { lat: 48.89941340000001, lng: 2.2142138000000386 }
+    };
+
+    const addressArray = location.address.split(",");
+    const address = await models.Address.create({
+      street: addressArray[0],
+      city: addressArray[1],
+      country: addressArray[2],
+      lat: location.coordinates.lat,
+      lang: location.coordinates.lng,
+      postcode: 0
+    });
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const error = new Error("Validation failed, entered data is incorrect.");
@@ -170,6 +189,10 @@ module.exports = {
           imageUrl: req.files[0].path
         })
           .then(post => {
+            /**
+             *
+             */
+            post.setAddress(address);
             req.files.map(file => {
               models.Image.create({
                 imageRef: file.path

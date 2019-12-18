@@ -142,7 +142,7 @@ exports.getAvatar = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
-      if (user.Avatar.imageRef) {
+      if (user.Avatar && user.Avatar.imageRef) {
         res.status(200).json({
           Avatar: user.Avatar.imageRef
         });
