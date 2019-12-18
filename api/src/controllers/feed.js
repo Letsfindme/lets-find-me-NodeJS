@@ -93,8 +93,8 @@ module.exports = {
   /*
    * Add rating to exesting post
    */
-  addRate: (req, res, next) => {
-    const errors = validationResult(req);
+  addRate: async (req, res, next) => {
+    const errors = await validationResult(req);
     const postId = req.params.postId;
     const rate = req.params.postRate;
     if (!errors.isEmpty()) {
@@ -141,7 +141,18 @@ module.exports = {
   /*
    * Create new post
    */
-  createPost: (req, res, next) => {
+  createPost: async (req, res, next) => {
+    const location = JSON.parse(req.body.location);
+    const addressArray = location.address.split(",");
+    const address = await models.Address.create({
+      street: addressArray[0],
+      city: addressArray[1],
+      country: addressArray[2],
+      lat: location.coordinates.lat,
+      lang: location.coordinates.lng,
+      postcode: 0
+    });
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const error = new Error("Validation failed, entered data is incorrect.");
@@ -165,11 +176,16 @@ module.exports = {
         return models.Post.create({
           title: title,
           content: content,
+          category: req.body.category,
           userId: user.id,
           author: user.username,
           imageUrl: req.files[0].path
         })
           .then(post => {
+            /**
+             *
+             */
+            post.setAddress(address);
             req.files.map(file => {
               models.Image.create({
                 imageRef: file.path
@@ -211,6 +227,10 @@ module.exports = {
         {
           model: models.Image,
           attributes: ["imageRef"]
+        },
+        {
+          model: models.Address,
+          attributes: ["city", "country", "lang", "lat"]
         },
         {
           model: models.User,

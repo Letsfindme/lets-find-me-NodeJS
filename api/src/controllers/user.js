@@ -39,36 +39,38 @@ exports.postAvatar = (req, res, next) => {
 };
 
 exports.getProfile = (req, res, next) => {
-  models.User.findByPk(req.userId, {
-    include: [
-      {
-        model: models.Avatar,
-        attributes: ["imageRef"]
-      },
-      {
-        model: models.Address
-      }
-    ]
-  })
-    .then(user => {
-      user["password"] = undefined;
-      if (!user) {
-        const error = new Error("Not found.");
-        error.statusCode = 404;
-        throw error;
-      } else if (user.addresses.length < 1) {
-        user["addresses"] = undefined;
-      }
-      res.status(200).json({
-        user: user
-      });
+  try {
+    models.User.findByPk(req.userId, {
+      include: [
+        {
+          model: models.Avatar,
+          attributes: ["imageRef"]
+        },
+        {
+          model: models.Address
+        }
+      ]
     })
-    .catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-    });
+      .then(user => {
+        user["password"] = undefined;
+        if (!user) {
+          const error = new Error("Not found.");
+          error.statusCode = 404;
+          throw error;
+        } else if (user.addresses.length < 1) {
+          user["addresses"] = undefined;
+        }
+        res.status(200).json({
+          user: user
+        });
+      })
+      .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
+      });
+  } catch (error) {}
 };
 
 exports.updateProfile = (req, res, next) => {
@@ -142,7 +144,7 @@ exports.getAvatar = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
-      if (user.Avatar.imageRef) {
+      if (user.Avatar && user.Avatar.imageRef) {
         res.status(200).json({
           Avatar: user.Avatar.imageRef
         });
