@@ -422,9 +422,23 @@ module.exports = {
       include: [
         {
           model: models.Address,
-          where: { 
+          where: {
             city: { [Op.like]: "%" + city + "%" }
           }
+        },
+        {
+          model: models.Image,
+          attributes: ["imageRef"]
+        },
+        {
+          model: models.User,
+          attributes: ["username"],
+          include: [
+            {
+              model: models.Avatar,
+              attributes: ["imageRef"]
+            }
+          ]
         }
       ]
     })
