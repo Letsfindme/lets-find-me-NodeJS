@@ -412,7 +412,7 @@ module.exports = {
   searchPost: (req, res) => {
     let { term, category, city } = req.query;
     // Make lowercase
-    term = term.toLowerCase();
+    term ? (term = term.toLowerCase()) : "";
 
     models.Post.findAll({
       where: {
