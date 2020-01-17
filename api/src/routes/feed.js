@@ -1,32 +1,32 @@
-const express = require('express');
-const { body } = require('express-validator');
+const express = require("express");
+const { body } = require("express-validator");
 
-const feedController = require('../controllers/feed');
-const isAuth = require('../middleware/authentication');
+const feedController = require("../controllers/feed");
+const isAuth = require("../middleware/authentication");
 
 const router = express.Router();
 
 // GET /feed/posts
-router.get('/posts', isAuth, feedController.getPosts);
+router.get("/posts", isAuth, feedController.getPosts);
 
 // POST /feed/post
 router.post(
-  '/post',
+  "/post",
   isAuth,
   [
-    body('title')
+    body("title")
       .trim()
       .isLength({ min: 5 }),
-    body('content')
+    body("content")
       .trim()
       .isLength({ min: 5 })
   ],
   feedController.createPost
 );
 
-router.get('/post/:postId', feedController.getPost);
-router.post('/post/:postId', isAuth, feedController.addComment);
-router.post('/post/:postId/:postRate', isAuth, feedController.addRate);
+router.get("/post/:postId", feedController.getPost);
+router.post("/post/:postId", isAuth, feedController.addComment);
+router.post("/post/:postId/:postRate", isAuth, feedController.addRate);
 
 /**
  * Get Top noted feeds for home
@@ -35,19 +35,22 @@ router.post('/post/:postId/:postRate', isAuth, feedController.addRate);
 router.get("/topfeed", feedController.getTopFeed);
 
 router.put(
-  '/post/:postId',
+  "/post/:postId",
   isAuth,
   [
-    body('title')
+    body("title")
       .trim()
       .isLength({ min: 5 }),
-    body('content')
+    body("content")
       .trim()
       .isLength({ min: 5 })
   ],
   feedController.updatePost
 );
 
-router.delete('/post/:postId', isAuth, feedController.deletePost);
+// Search for posts /feed/search
+router.get("/search", feedController.searchPost);
+
+router.delete("/post/:postId", isAuth, feedController.deletePost);
 
 module.exports = router;

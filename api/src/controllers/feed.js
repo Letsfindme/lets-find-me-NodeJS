@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { validationResult } = require("express-validator");
+const Op = models.Sequelize.Op;
 
 import models from "../setup/models";
 // const User = require("../models/user");
@@ -406,6 +407,48 @@ module.exports = {
   clearImage: filePath => {
     filePath = path.join(__dirname, "..", filePath);
     fs.unlink(filePath, err => console.log(err));
+  },
+  // Search for post
+  searchPost: (req, res) => {
+    let { term, category, city } = req.query;
+    // Make lowercase
+    term ? (term = term.toLowerCase()) : "";
+
+    models.Post.findAll({
+      where: {
+        title: { [Op.like]: "%" + term + "%" },
+        category: { [Op.like]: "%" + category + "%" }
+      },
+      include: [
+        {
+          model: models.Address,
+          where: {
+            city: { [Op.like]: "%" + city + "%" }
+          }
+        },
+        {
+          model: models.Image,
+          attributes: ["imageRef"]
+        },
+        {
+          model: models.User,
+          attributes: ["username"],
+          include: [
+            {
+              model: models.Avatar,
+              attributes: ["imageRef"]
+            }
+          ]
+        }
+      ]
+    })
+      .then(result => {
+        res.status(200).json({
+          message: "Post updated!",
+          post: result
+        });
+      })
+      .catch(err => console.log(err));
   }
 };
 // module.exports = {
