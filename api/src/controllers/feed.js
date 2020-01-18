@@ -13,8 +13,6 @@ import models from "../setup/models";
 module.exports = {
   getPosts: (req, res, next) => {
     const currentPage = req.query.page || 1;
-    console.log("currentPage currentPagecurrentPagecurrentPage", currentPage);
-
     const perPage = 2;
     let totalItems;
     models.Post.findAll()
@@ -91,6 +89,7 @@ module.exports = {
         next(err);
       });
   },
+
   /*
    * Add rating to exesting post
    */
@@ -139,6 +138,7 @@ module.exports = {
         next(err);
       });
   },
+
   /*
    * Create new post
    */
@@ -408,47 +408,64 @@ module.exports = {
     filePath = path.join(__dirname, "..", filePath);
     fs.unlink(filePath, err => console.log(err));
   },
-  // Search for post
-  searchPost: (req, res) => {
-    let { term, category, city } = req.query;
+
+  /**
+   * Search for post
+   */
+  searchPost: async (req, res) => {
+    //currentPage is one only if undefined "null not included"
+    let { term, category, city, currentPage = 0, pageSize = 1 } = req.query;
+    // Make sure these are numbers
+    currentPage = Number(currentPage);
+    pageSize = Number(pageSize);
     // Make lowercase
     term ? (term = term.toLowerCase()) : "";
+    //offset = currentPage(7) * pageSize(25) = 175
+    //limit = pageSize(25)
+    const offset = currentPage * pageSize;
+    const limit = pageSize;
 
-    models.Post.findAll({
-      where: {
-        title: { [Op.like]: "%" + term + "%" },
-        category: { [Op.like]: "%" + category + "%" }
-      },
-      include: [
-        {
-          model: models.Address,
-          where: {
-            city: { [Op.like]: "%" + city + "%" }
-          }
+    try {
+      const { count, rows: posts } = await models.Post.findAndCountAll({
+        limit,
+        offset,
+        order: [["createdAt", "ASC"]],
+        where: {
+          title: { [Op.like]: "%" + term + "%" },
+          category: { [Op.like]: "%" + category + "%" }
         },
-        {
-          model: models.Image,
-          attributes: ["imageRef"]
-        },
-        {
-          model: models.User,
-          attributes: ["username"],
-          include: [
-            {
-              model: models.Avatar,
-              attributes: ["imageRef"]
+        include: [
+          {
+            model: models.Address,
+            where: {
+              city: { [Op.like]: "%" + city + "%" }
             }
-          ]
-        }
-      ]
-    })
-      .then(result => {
-        res.status(200).json({
-          message: "Post updated!",
-          post: result
-        });
-      })
-      .catch(err => console.log(err));
+          },
+          {
+            model: models.Image,
+            attributes: ["imageRef"]
+          },
+          {
+            model: models.User,
+            attributes: ["username"],
+            include: [
+              {
+                model: models.Avatar,
+                attributes: ["imageRef"]
+              }
+            ]
+          }
+        ]
+      });
+      return res.status(200).json({
+        message: "Posts found!",
+        post: posts,
+        currentPage,
+        count
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 };
 // module.exports = {
