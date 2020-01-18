@@ -4,7 +4,7 @@ import models from "../setup/models";
 // const Avatar = require("../models/avatar");
 
 exports.postAvatar = (req, res, next) => {
-  if (!req.files) {
+  if (!req.files || req.files.length == 0) {
     const error = new Error("No image provided.");
     error.statusCode = 422;
     throw error;
