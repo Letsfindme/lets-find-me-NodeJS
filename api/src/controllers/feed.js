@@ -413,7 +413,6 @@ module.exports = {
    * Search for post
    */
   searchPost: async (req, res) => {
-    console.log(req.query);
     //currentPage is one only if undefined "null not included"
     let { term, category, city, currentPage = 1, pageSize = 2 } = req.query;
 
@@ -463,7 +462,6 @@ module.exports = {
         order: [["title", "ASC"]]
       });
       if (posts.length > 0) {
-        console.log("vvvvvvv");
         return res.status(200).json({
           message: "Posts found!",
           post: posts,
@@ -471,8 +469,6 @@ module.exports = {
           count: count / 2
         });
       } else {
-        console.log("xxxxxxxxxxx");
-        
         return res.status(200).json({
           message: "Sorry change search term!"
         });
