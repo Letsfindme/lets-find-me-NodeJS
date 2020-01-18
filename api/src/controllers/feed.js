@@ -413,11 +413,14 @@ module.exports = {
    * Search for post
    */
   searchPost: async (req, res) => {
+    console.log(req.query);
     //currentPage is one only if undefined "null not included"
-    let { term, category, city, currentPage = 0, pageSize = 1 } = req.query;
+    let { term, category, city, currentPage = 1, pageSize = 2 } = req.query;
+
     // Make sure these are numbers
-    currentPage = Number(currentPage);
-    pageSize = Number(pageSize);
+    currentPage = parseInt(currentPage);
+    currentPage == 1 ? (currentPage = 0) : (currentPage = currentPage - 1);
+    pageSize = parseInt(pageSize);
     // Make lowercase
     term ? (term = term.toLowerCase()) : "";
     //offset = currentPage(7) * pageSize(25) = 175
@@ -429,7 +432,8 @@ module.exports = {
       const { count, rows: posts } = await models.Post.findAndCountAll({
         limit,
         offset,
-        order: [["createdAt", "ASC"]],
+        // todo order
+        //order: [["createdAt", "ASC"]],
         where: {
           title: { [Op.like]: "%" + term + "%" },
           category: { [Op.like]: "%" + category + "%" }
@@ -455,16 +459,26 @@ module.exports = {
               }
             ]
           }
-        ]
+        ],
+        order: [["title", "ASC"]]
       });
-      return res.status(200).json({
-        message: "Posts found!",
-        post: posts,
-        currentPage,
-        count
-      });
+      if (posts.length > 0) {
+        console.log("vvvvvvv");
+        return res.status(200).json({
+          message: "Posts found!",
+          post: posts,
+          currentPage: currentPage + 1,
+          count: count / 2
+        });
+      } else {
+        console.log("xxxxxxxxxxx");
+        
+        return res.status(200).json({
+          message: "Sorry change search term!"
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   }
 };
