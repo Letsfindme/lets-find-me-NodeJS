@@ -8,7 +8,8 @@ import morgan from "morgan";
 const feedRoutes = require("../routes/feed");
 const authRoutes = require("../routes/auth");
 const userRoute = require("../routes/user");
-
+const adminRoute = require("../routes/admin");
+const isAdmin = require("../middleware/is-admin");
 // import feedRoutes from"../routes/feed";
 // import authRoutes from"../routes/auth";
 // import userRoute from"./routes/user";
@@ -36,7 +37,7 @@ export default function(server) {
     express.static(path.join(__dirname, "..", "..", "/public"))
   );
   // server.use("/images", express.static(path.join(__dirname, "images")));
-  
+
   // HTTP logger
   if (NODE_ENV === "development") {
     server.use(morgan("tiny"));
@@ -46,8 +47,12 @@ export default function(server) {
   server.use("/feed", feedRoutes);
   server.use("/auth", authRoutes);
   server.use("/user", userRoute);
+  server.use("/admin", isAdmin, adminRoute);
+
+  // error handler
   server.use((error, req, res, next) => {
-    console.log(error);
+    // todo log error properly
+    //console.log(error);
     const status = error.statusCode || 500;
     const message = error.message;
     const data = error.data;

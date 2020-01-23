@@ -6,6 +6,7 @@ import databaseConnection from './database'
 
 const models = {
   User: databaseConnection.import('../models/user'),
+  Role: databaseConnection.import('../models/role'),
   Address: databaseConnection.import('../models/address'),
   Avatar: databaseConnection.import('../models/avatar'),
   CartItem: databaseConnection.import('../models/cart-item'),
