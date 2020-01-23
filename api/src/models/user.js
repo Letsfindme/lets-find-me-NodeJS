@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     User.hasOne(models.Avatar);
     User.hasOne(models.Cart);
     User.hasMany(models.Order);
+    User.belongsTo(models.Role);
     //todo
     User.belongsToMany(models.Post, { through: models.PostRate });
   };
