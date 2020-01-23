@@ -10,7 +10,7 @@ import models from "../setup/models";
 // const Avatar = require("../models/avatar");
 // const PostRate = require("../models/postRate");
 
-module.exports = {
+module.exports = { 
   getPosts: (req, res, next) => {
     const currentPage = req.query.page || 1;
     const perPage = 2;
