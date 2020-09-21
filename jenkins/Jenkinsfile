@@ -14,7 +14,7 @@ pipeline {
         stage('DB') {
             steps {
                 sh'pwd'
-                sh '/usr/local/bin/docker-compose up'
+                // sh '/usr/local/bin/docker-compose up -d'
             }
         }
         stage('Build') {

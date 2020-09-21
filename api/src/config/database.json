@@ -5,7 +5,8 @@
     "database": "app",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "seederStorage": "sequelize"
+    "seederStorage": "sequelize",
+    "port":"3303"
   },
   "production": {
     "username": "root",
@@ -13,6 +14,7 @@
     "database": "app",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "seederStorage": "sequelize"
+    "seederStorage": "sequelize",
+    "port":"3303"
   }
 }

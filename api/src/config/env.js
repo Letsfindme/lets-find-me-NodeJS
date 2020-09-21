@@ -8,4 +8,4 @@ dotenv.config()
 export const NODE_ENV = process.env.NODE_ENV
 
 // Port
-export const PORT = process.env.PORT || 8080
+export const PORT = process.env.PORT || 1989
