@@ -1,7 +1,6 @@
 const path = require('path');
 
 const express = require('express');
-
 const adminController = require('../controllers/admin');
 const userController = require('../controllers/user');
 const isAuth = require("../middleware/authentication");

@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     createdDate: Sequelize.DATE,
     birthday: Sequelize.DATE,
     age: Sequelize.INTEGER,
+    credit: Sequelize.INTEGER,
     status: Sequelize.STRING
   });
 

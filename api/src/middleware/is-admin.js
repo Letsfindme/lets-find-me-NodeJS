@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 import models from "../setup/models";
+import serverConfig from "../config/server.json";
 
 module.exports = async (req, res, next) => {
   try {
@@ -11,7 +12,7 @@ module.exports = async (req, res, next) => {
     }
     const token = authHeader.split(" ")[1];
     // decodedToken;
-    let decodedToken = jwt.verify(token, "let$f!ndsomesupersecre+secre+");
+    let decodedToken = jwt.verify(token, serverConfig.secret);
     if (!decodedToken) {
       const error = new Error("Not authenticated.");
       error.statusCode = 401;

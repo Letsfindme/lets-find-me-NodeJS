@@ -1,7 +1,4 @@
 import models from "../setup/models";
-// const User = require("../models/user");
-// const Address = require("../models/address");
-// const Avatar = require("../models/avatar");
 
 exports.postAvatar = (req, res, next) => {
   if (!req.files || req.files.length == 0) {
