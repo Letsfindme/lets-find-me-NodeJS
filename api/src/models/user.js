@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     createdDate: Sequelize.DATE,
     birthday: Sequelize.DATE,
     age: Sequelize.INTEGER,
+    credit: Sequelize.INTEGER,
     status: Sequelize.STRING
   });
 
@@ -30,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     User.hasOne(models.Avatar);
     User.hasOne(models.Cart);
     User.hasMany(models.Order);
+    User.belongsTo(models.Role);
     //todo
     User.belongsToMany(models.Post, { through: models.PostRate });
   };

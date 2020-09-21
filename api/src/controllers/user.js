@@ -1,10 +1,7 @@
 import models from "../setup/models";
-// const User = require("../models/user");
-// const Address = require("../models/address");
-// const Avatar = require("../models/avatar");
 
 exports.postAvatar = (req, res, next) => {
-  if (!req.files) {
+  if (!req.files || req.files.length == 0) {
     const error = new Error("No image provided.");
     error.statusCode = 422;
     throw error;
@@ -140,16 +137,18 @@ exports.getAvatar = (req, res, next) => {
   })
     .then(user => {
       if (!user) {
-        const error = new Error("Not found.");
-        error.statusCode = 404;
-        throw error;
-      }
-      if (user.Avatar && user.Avatar.imageRef) {
-        res.status(200).json({
+        return res.status(202).json({
+          Avatar: null
+        });
+        // const error = new Error("Not found.");
+        // error.statusCode = 404;
+        // throw error;
+      } else if (user.Avatar && user.Avatar.imageRef) {
+        return res.status(200).json({
           Avatar: user.Avatar.imageRef
         });
       } else {
-        res.status(200).json({
+        return res.status(200).json({
           Avatar: null
         });
       }

@@ -9,26 +9,69 @@ import models from "../setup/models";
 // const Comment = require("../models/postComment");
 // const Avatar = require("../models/avatar");
 // const PostRate = require("../models/postRate");
+const rewardPost = 20;
+const rewardComment = 1;
 
 module.exports = {
-  getPosts: (req, res, next) => {
-    const currentPage = req.query.page || 1;
-    const perPage = 2;
-    let totalItems;
-    models.Post.findAll()
-      .then(posts => {
-        res.status(200).json({
-          message: "Fetched posts successfully.",
-          posts: posts,
-          totalItems: totalItems
-        });
-      })
-      .catch(err => {
-        if (!err.statusCode) {
-          err.statusCode = 500;
-        }
-        next(err);
+  /*
+   * Get posts by user
+   */
+  getPosts: async (req, res, next) => {
+    //currentPage is one only if undefined "null not included"
+    let { currentPage = 1, pageSize = 4 } = req.query;
+
+    // Make sure these are numbers
+    currentPage = parseInt(currentPage);
+    currentPage == 1 ? (currentPage = 0) : (currentPage = currentPage - 1);
+    pageSize = parseInt(pageSize);
+
+    //offset = currentPage(7) * pageSize(25) = 175
+    //limit = pageSize(25)
+    const offset = currentPage * pageSize;
+    const limit = pageSize;
+
+    try {
+      const { count, rows: posts } = await models.Post.findAndCountAll({
+        limit,
+        offset,
+        // todo order
+        //order: [["createdAt", "ASC"]],
+        where: {
+          userId: req.user.id
+        },
+        include: [
+          {
+            model: models.Image,
+            attributes: ["imageRef"]
+          },
+          {
+            model: models.User,
+            attributes: ["username"],
+            include: [
+              {
+                model: models.Avatar,
+                attributes: ["imageRef"]
+              }
+            ]
+          }
+        ],
+        order: [["title", "ASC"]]
       });
+      if (posts.length > 0) {
+        return res.status(200).json({
+          message: "Posts found!",
+          posts: posts,
+          currentPage: currentPage + 1,
+          count: count / pageSize
+        });
+      } else {
+        return res.status(200).json({
+          message: "No posts found!"
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   },
 
   /*
@@ -42,7 +85,7 @@ module.exports = {
       error.statusCode = 422;
       throw error;
     }
-    models.User.findByPk(req.user.userId, {
+    models.User.findByPk(req.user.id, {
       include: [
         {
           model: models.Avatar,
@@ -52,17 +95,18 @@ module.exports = {
     })
       .then(user => {
         if (user.Avatars) {
+          user.update({ credit: user.credit + rewardComment });
           return models.PostComment.create({
             text: req.body.text,
             imageRef: user.Avatars.imageRef,
-            userId: req.user.userId,
+            userId: req.user.id,
             postId: postId
           });
         } else {
           return models.PostComment.create({
             text: req.body.text,
             imageRef: "",
-            userId: req.user.userId,
+            userId: req.user.id,
             postId: postId
           });
         }
@@ -108,7 +152,7 @@ module.exports = {
     models.PostRate.findOne({
       where: {
         postId: postId,
-        userId: req.user.userId
+        userId: req.user.id
       }
     })
       .then(postRate => {
@@ -119,12 +163,16 @@ module.exports = {
         } else {
           models.PostRate.create({
             postId: postId,
-            userId: req.user.userId,
+            userId: req.user.id,
             rate: rate
           });
         }
       })
-      .then(res => models.Post.findByPk(postId))
+      .then(res => {
+        //Add award to user after rating
+        req.user.update({ credit: req.user.credit + rewardComment });
+        return models.Post.findByPk(postId);
+      })
       .then(post => {
         res.status(201).json({
           message: "Rate added successfully!",
@@ -167,13 +215,17 @@ module.exports = {
     }
     const title = req.body.title;
     const content = req.body.content;
-    return models.User.findByPk(req.user.userId)
+    let credit = 0;
+    return models.User.findByPk(req.user.id)
       .then(user => {
         if (!user) {
-          const error = new Error("Not found.");
+          const error = new Error("User not found.");
           error.statusCode = 404;
           throw error;
         }
+        ///Add reward to user after posting
+        credit = user.credit + rewardPost;
+        user.update({ credit: user.credit + rewardPost });
         return models.Post.create({
           title: title,
           content: content,
@@ -187,6 +239,7 @@ module.exports = {
              *
              */
             post.setAddress(address);
+            
             req.files.map(file => {
               models.Image.create({
                 imageRef: file.path
@@ -194,6 +247,7 @@ module.exports = {
                 image.setPost(post);
               });
             });
+            return post;
             // ,
             // Post.update({
             //   imageUrl: req.files[0].path
@@ -207,8 +261,8 @@ module.exports = {
             res.status(201).json({
               message: "Post created successfully!",
               post: post,
-              userId: req.user.userId
-              //auther: auther
+              userId: req.user.id,
+              credit: credit
             });
           });
       })
@@ -272,7 +326,7 @@ module.exports = {
         next(err);
       });
   },
-
+  // todo fix get top for each category
   /**
    * Get Top noted feeds for home
    */
@@ -310,7 +364,44 @@ module.exports = {
         next(err);
       });
   },
-
+  //todo fix get top 4 of selected category
+  /**
+   * Get Top noted feeds by category
+   */
+  getTopSearchFeed: (req, res, next) => {
+    // var t5 = mydata.slice(0,5);
+    models.Post.findAll({
+      limit: 4,
+      include: [
+        {
+          model: models.Image,
+          attributes: ["imageRef"]
+        },
+        {
+          model: models.User,
+          attributes: ["username"],
+          include: [
+            {
+              model: models.Avatar,
+              attributes: ["imageRef"]
+            }
+          ]
+        }
+      ]
+    })
+      .then(posts => {
+        res.status(200).json({
+          message: "Fetched top posts successfully.",
+          posts: posts
+        });
+      })
+      .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
+      });
+  },
   /*
    * update exesting post
    */
@@ -340,7 +431,7 @@ module.exports = {
           error.statusCode = 404;
           throw error;
         }
-        if (post.creator.toString() !== req.user.userId) {
+        if (post.creator.toString() !== req.user.id) {
           const error = new Error("Not authorized!");
           error.statusCode = 403;
           throw error;
@@ -375,7 +466,7 @@ module.exports = {
           error.statusCode = 404;
           throw error;
         }
-        if (post.creator.toString() !== req.user.userId) {
+        if (post.creator.toString() !== req.user.id) {
           const error = new Error("Not authorized!");
           error.statusCode = 403;
           throw error;
@@ -385,7 +476,7 @@ module.exports = {
         return Post.findByIdAndRemove(postId);
       })
       .then(result => {
-        return User.findById(req.user.userId);
+        return User.findById(req.user.id);
       })
       .then(user => {
         user.posts.pull(postId);
@@ -414,10 +505,12 @@ module.exports = {
    */
   searchPost: async (req, res) => {
     //currentPage is one only if undefined "null not included"
-    let { term, category, city, currentPage = 0, pageSize = 1 } = req.query;
+    let { term, category, city, currentPage = 1, pageSize = 2 } = req.query;
+
     // Make sure these are numbers
-    currentPage = Number(currentPage);
-    pageSize = Number(pageSize);
+    currentPage = parseInt(currentPage);
+    currentPage == 1 ? (currentPage = 0) : (currentPage = currentPage - 1);
+    pageSize = parseInt(pageSize);
     // Make lowercase
     term ? (term = term.toLowerCase()) : "";
     //offset = currentPage(7) * pageSize(25) = 175
@@ -429,7 +522,8 @@ module.exports = {
       const { count, rows: posts } = await models.Post.findAndCountAll({
         limit,
         offset,
-        order: [["createdAt", "ASC"]],
+        // todo order
+        //order: [["createdAt", "ASC"]],
         where: {
           title: { [Op.like]: "%" + term + "%" },
           category: { [Op.like]: "%" + category + "%" }
@@ -455,16 +549,23 @@ module.exports = {
               }
             ]
           }
-        ]
+        ],
+        order: [["title", "ASC"]]
       });
-      return res.status(200).json({
-        message: "Posts found!",
-        post: posts,
-        currentPage,
-        count
-      });
+      if (posts.length > 0) {
+        return res.status(200).json({
+          message: "Posts found!",
+          post: posts,
+          currentPage: currentPage + 1,
+          count: count / 2
+        });
+      } else {
+        return res.status(200).json({
+          message: "Sorry change search term!"
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   }
 };

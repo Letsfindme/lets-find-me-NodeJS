@@ -1,10 +1,8 @@
-const {
-  validationResult
-} = require('express-validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-
-import models from '../setup/models'
+const { validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+import models from "../setup/models";
+import serverConfig from "../config/server.json";
 
 exports.signup = (req, res, next) => {
   // const errors = validationResult(req);
@@ -14,25 +12,40 @@ exports.signup = (req, res, next) => {
   //   error.data = errors.array();
   //   throw error;
   // }
+
+  /**
+   * By default user hase 'user' type
+   */
+  const ROLETYPE = "User";
   const email = req.body.email;
   const username = req.body.username;
   const password = req.body.password;
   bcrypt
     .hash(password, 12)
     .then(hashedPw => {
-      const user = new models.User({
+      const User = new models.User({
         email: email,
         password: hashedPw,
         username: username
       });
-      return user.save();
+      return User.save();
     })
-    .then(result => {
-      res.status(201).json({
-        message: 'User created!',
-        userId: result._id
+    .then(User => {
+      models.Role.findOne({
+        where: {
+          type: ROLETYPE
+        }
+      }).then(role => {
+        return User.setRole(role);
       });
+      return User;
     })
+    .then(user =>
+      res.status(201).json({
+        message: "User created!",
+        userId: user._id
+      })
+    )
     .catch(err => {
       if (!err.statusCode) {
         err.statusCode = 500;
@@ -48,40 +61,53 @@ exports.login = (req, res, next) => {
   models.User.findAll({
     where: {
       email: email
-    }
-  }).then(user => {
-    if (!user[0]) {
-      const error = new Error('A user with this email could not be found.');
-      error.statusCode = 401;
-      throw error;
-    }
-    loadedUser = user[0];
-    return bcrypt.compare(password, user[0].password);
+    },
+    include: [
+      {
+        model: models.Role,
+        attributes: ["type"]
+      }
+    ]
   })
-    .then(isEqual => {
-      if (!isEqual) {
-        const error = new Error('Wrong password!');
+    .then(user => {
+      if (!user[0]) {
+        const error = new Error("A user with this email could not be found.");
         error.statusCode = 401;
         throw error;
       }
-      const token = jwt.sign({
-        email: loadedUser.email,
-        userId: loadedUser.id.toString()
-      },
-      //todo export string
-        'let$f!ndsomesupersecre+secre+', {
-        expiresIn: '240h'
+      loadedUser = user[0];
+      return bcrypt.compare(password, user[0].password);
+    })
+    .then(isEqual => {
+      if (!isEqual) {
+        const error = new Error("Wrong password!");
+        error.statusCode = 401;
+        throw error;
       }
+      const token = jwt.sign(
+        {
+          email: loadedUser.email,
+          userId: loadedUser.id.toString(),
+          type: loadedUser.role.type,
+          credit: loadedUser.credit,
+        },
+        serverConfig.secret,
+        {
+          expiresIn: "240h"
+        }
       );
       res.status(200).json({
         token: token,
-        userId: loadedUser.id.toString()
+        userId: loadedUser.id.toString(),
+        type: loadedUser.role.type,
+        credit: loadedUser.credit,
       });
     })
     .catch(err => {
       if (!err.statusCode) {
         err.statusCode = 500;
       }
+      //to de prevent forward error to user
       next(err);
     });
 };
@@ -90,7 +116,7 @@ exports.getUserStatus = (req, res, next) => {
   models.User.findByPk(req.userId)
     .then(user => {
       if (!user) {
-        const error = new Error('User not found.');
+        const error = new Error("User not found.");
         error.statusCode = 404;
         throw error;
       }
@@ -111,7 +137,7 @@ exports.updateUserStatus = (req, res, next) => {
   models.User.findByPk(req.userId)
     .then(user => {
       if (!user) {
-        const error = new Error('User not found.');
+        const error = new Error("User not found.");
         error.statusCode = 404;
         throw error;
       }
@@ -120,7 +146,7 @@ exports.updateUserStatus = (req, res, next) => {
     })
     .then(result => {
       res.status(200).json({
-        message: 'User updated.'
+        message: "User updated."
       });
     })
     .catch(err => {
