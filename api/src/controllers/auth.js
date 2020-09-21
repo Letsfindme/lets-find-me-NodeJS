@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 import models from "../setup/models";
+import serverConfig from "../config/server.json";
 
 exports.signup = (req, res, next) => {
   // const errors = validationResult(req);
@@ -87,10 +88,10 @@ exports.login = (req, res, next) => {
         {
           email: loadedUser.email,
           userId: loadedUser.id.toString(),
-          type: loadedUser.role.type
+          type: loadedUser.role.type,
+          credit: loadedUser.credit,
         },
-        //todo export string
-        "let$f!ndsomesupersecre+secre+",
+        serverConfig.secret,
         {
           expiresIn: "240h"
         }
@@ -98,7 +99,8 @@ exports.login = (req, res, next) => {
       res.status(200).json({
         token: token,
         userId: loadedUser.id.toString(),
-        type: loadedUser.role.type
+        type: loadedUser.role.type,
+        credit: loadedUser.credit,
       });
     })
     .catch(err => {
