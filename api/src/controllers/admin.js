@@ -6,11 +6,22 @@ const Product = require("../models/product");
  */
 exports.postAddProduct = async (req, res, next) => {
   try {
-    const { title, imageUrl, price, description } = req.body;
+    const { title, price, description } = req.body;
+    if (!req.files[0]) {
+      const error = new Error("No image provided or user not registred");
+      error.statusCode = 422;
+      throw error;
+    }
+    if (!title || !price || !description) {
+      console.log("message: Body is empty! error creating product!");
+      return res
+        .status(400)
+        .json({ message: "Body is empty! error creating product!" });
+    }
     const product = await models.Product.create({
       title,
       price,
-      imageUrl,
+      imageUrl: req.files[0].path,
       description
     });
     return res
@@ -18,27 +29,21 @@ exports.postAddProduct = async (req, res, next) => {
       .json({ product, message: "success created product!" });
   } catch (error) {
     res.status(500).json({ message: "error creating product!" });
-    console.error(err);
+    console.error("message: error creating product!", error.message);
   }
 };
 
 /**
  * Admin update exesiting product
  */
-exports.postEditProduct = async (req, res, next) => {
+exports.putEditProduct = async (req, res, next) => {
   try {
-    const {
-      prodId,
-      updatedTitle,
-      updatedPrice,
-      updatedImageUrl,
-      updatedDesc
-    } = req.body;
+    const { title, price, description, prodId, imageUrl } = req.body;
     const product = await models.Product.findByPk(prodId);
-    product.title = updatedTitle;
-    product.price = updatedPrice;
-    product.description = updatedDesc;
-    product.imageUrl = updatedImageUrl;
+    product.title = title;
+    product.price = price;
+    product.description = description;
+    product.imageUrl = req.files[0] ? req.files[0].path : imageUrl;
     const savedProduct = await product.save();
     res
       .status(200)
@@ -54,7 +59,7 @@ exports.postEditProduct = async (req, res, next) => {
 exports.getProducts = async (req, res, next) => {
   try {
     const products = await models.Product.findAll();
-    return res.status(302).json(products);
+    return res.status(200).json(products);
   } catch (error) {
     err => console.log(err);
   }
@@ -65,11 +70,15 @@ exports.getProducts = async (req, res, next) => {
  */
 exports.postDeleteProduct = async (req, res, next) => {
   try {
-    const prodId = req.body.productId;
+    const prodId = req.body.prodId;
     const product = await models.Product.findByPk(prodId);
+    if (!product) {
+      res.status(400).json({ deletedProduct, message: "Not found!!" });
+    }
     const deletedProduct = await product.destroy();
     res.status(200).json({ deletedProduct, message: "DESTROYED PRODUCT" });
   } catch (error) {
-    err => console.log(err);
+    console.log(err);
+    res.status(500).json({ message: "Can't delete :/" });
   }
 };
