@@ -23,6 +23,11 @@ router.post(
   ],
   feedController.createPost
 );
+/*
+ * Get posts by user
+ * /feed/user-posts/
+ */
+router.get("/user-posts/",isAuth, feedController.getPosts);
 
 router.get("/post/:postId", feedController.getPost);
 router.post("/post/:postId", isAuth, feedController.addComment);
@@ -33,6 +38,7 @@ router.post("/post/:postId/:postRate", isAuth, feedController.addRate);
  * /feed/topfeed
  */
 router.get("/topfeed", feedController.getTopFeed);
+router.get("/topsearch", feedController.getTopSearchFeed);
 
 router.put(
   "/post/:postId",
