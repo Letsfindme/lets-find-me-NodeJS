@@ -10,6 +10,14 @@ pipeline {
         CI = 'true'
     }
     stages {
+        stage('DB') {
+            steps {
+                dir('/usr/local/bin') {
+                    sh'pwd'
+                    sh 'docker-compose up'
+                }
+            }
+        }
         stage('Build') {
             steps {
                 dir('api') {
