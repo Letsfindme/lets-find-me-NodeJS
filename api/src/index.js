@@ -18,18 +18,9 @@ import setupStartServer from './setup/start-server'
 // const sequelize = require("./util/database");
 // const port = process.env.PORT || 8080;
 
-const fs = require('fs');
-const http = require('http');
-const https = require('https');
-const privateKey  = fs.readFileSync('./sslcert/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('./sslcert/fullchain.pem', 'utf8');
-const credentials = {key: privateKey, cert: certificate};
 
 // Create express server
 const server = express()
-
-var httpsServer = https.createServer(credentials, server);
-httpsServer.listen(1990);
 
 // Setup uploads
 setupUpload(server)
