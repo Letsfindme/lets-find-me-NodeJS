@@ -21,7 +21,7 @@ pipeline {
             steps {
                 dir('api') {
                     sh'pwd'
-                    sh'sed -i '/PORT/c\PORT=1989' .env'
+                    sh "sed -i '/PORT/c PORT=1989' .env"
                     sh 'npm install'
                 }
             }
@@ -35,7 +35,6 @@ pipeline {
             steps {
                 sh' chmod 755 ./jenkins/scripts/deliver.sh'
                 sh './jenkins/scripts/deliver.sh'
-                input message: 'Finished using the web site? (Click "Proceed" to continue)'
             }
         }
     }
