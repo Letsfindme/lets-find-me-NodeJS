@@ -2,7 +2,7 @@ echo 'The following "npm" command buildsLetsFindNode application'
 echo '"/var/jenkins_home/workspace/LetsFindNode" directory),'
 set -x
 cd api
-npm run start:prod
+npm run build:prod
 set +x
 
 set -x
