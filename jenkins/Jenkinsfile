@@ -22,6 +22,7 @@ pipeline {
                 dir('api') {
                     sh'pwd'
                     sh "sed -i '/PORT/c PORT=1989' .env"
+                    sh "sed -i '/NODE_ENV/c NODE_ENV=production' .env"
                     sh 'npm install'
                 }
             }

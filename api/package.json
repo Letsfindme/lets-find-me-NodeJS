@@ -14,7 +14,7 @@
     "start": "src/index.js --exec babel-node",
     "start:prod": "npm run build:prod && npm run start:server",
     "build:prod": "babel src -s -D -d build",
-    "start:server": "nohup node build/index.js > /dev/null 2>&1 &"
+    "start:server": "forever start build/index.js"
   },
   "author": "Fadi NOUFAL",
   "license": "ISC",

@@ -5,7 +5,7 @@ services:
   db:
     image: mysql:5.7
     ports:
-      - 3303:3306
+      - 3306:3306
     environment:
       - MYSQL_DATABASE=app
       - MYSQL_USER=letsfind
