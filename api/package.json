@@ -5,16 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.js",
+    "dev": "nodemon src/index.js --exec babel-node",
     "setup": "npm run setup:install && npm run setup:db",
     "setup:install": "npm install",
     "setup:db": "npm run db:migrate && npm run db:seed",
     "db:migrate": "./node_modules/.bin/sequelize db:migrate",
     "db:seed": "./node_modules/.bin/sequelize db:seed:all",
-    "start": "nodemon src/index.js --exec babel-node",
+    "start": "src/index.js --exec babel-node",
     "start:prod": "npm run build:prod && npm run start:server",
     "build:prod": "babel src -s -D -d build",
-    "start:server": "node build/index.js"
+    "start:server": "nohup node build/index.js > /dev/null 2>&1 &"
   },
   "author": "Fadi NOUFAL",
   "license": "ISC",
