@@ -26,10 +26,10 @@ const connection = new Sequelize(
 console.info("SETUP - Connecting database...",databaseConfigEnv.port);
 
 connection
-  .sync({
-      force: true
-  })
-  // .authenticate()
+  // .sync({
+  //     force: true
+  // })
+  .authenticate()
   .then(() => {
     console.info(chalk.green.inverse.bold("INFO - Database connected."));
   })

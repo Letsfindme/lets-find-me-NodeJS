@@ -28,6 +28,9 @@ const credentials = {key: privateKey, cert: certificate};
 // Create express server
 const server = express()
 
+var httpsServer = https.createServer(credentials, server);
+httpsServer.listen(1990);
+
 // Setup uploads
 setupUpload(server)
 
