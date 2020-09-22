@@ -21,6 +21,7 @@ pipeline {
             steps {
                 dir('api') {
                     sh'pwd'
+                    sh'sed -i '/PORT/c\PORT=1989' .env'
                     sh 'npm install'
                 }
             }
