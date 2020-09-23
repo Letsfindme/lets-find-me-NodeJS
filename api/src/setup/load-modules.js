@@ -19,11 +19,23 @@ const isAdmin = require("../middleware/is-admin");
 import { NODE_ENV } from "../config/env";
 
 // Load express modules
-export default function(server) {
+export default function (server) {
   console.info("SETUP - Loading modules...");
 
+  // Set up a whitelist and check against it:
+  var whitelist = ["https://letsfindme.online", "https://letsfindme.store"];
+  var corsOptions = {
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  };
+
   // Enable CORS
-  server.use(cors());
+  server.use(cors(corsOptions));
 
   // Request body parser
   server.use(bodyParser.json());
@@ -31,12 +43,6 @@ export default function(server) {
 
   // Request body cookie parser
   server.use(cookieParser());
-
-  server.all('*', function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    next();
- });
 
   // Static files folder
   server.use(
@@ -49,7 +55,7 @@ export default function(server) {
   // if (NODE_ENV === "development") {
   //   server.use(morgan("tiny"));
   // }
-  server.use(morgan("dev"))
+  server.use(morgan("dev"));
   // Load routers
   server.use("/feed", feedRoutes);
   server.use("/auth", authRoutes);
@@ -66,7 +72,7 @@ export default function(server) {
     const data = error.data;
     res.status(status).json({
       message: message,
-      data: data
+      data: data,
     });
   });
 }
