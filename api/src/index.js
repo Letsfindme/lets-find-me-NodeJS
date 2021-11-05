@@ -18,6 +18,7 @@ import setupStartServer from './setup/start-server'
 // const sequelize = require("./util/database");
 // const port = process.env.PORT || 8080;
 
+
 // Create express server
 const server = express()
 

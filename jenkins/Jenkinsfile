@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+    // agent {
+    //     docker {
+    //         image 'node:10-alpine'
+    //         args '-p 3000:3000'
+    //     }
+    // }
+    environment {
+        HOME = '.'
+        CI = 'true'
+    }
+    stages {
+        stage('DB') {
+            steps {
+                sh'pwd'
+                // sh '/usr/local/bin/docker-compose up -d'
+            }
+        }
+        stage('Build') {
+            steps {
+                dir('api') {
+                    sh'pwd'
+                    sh "sed -i '/PORT/c PORT=1989' .env"
+                    sh "sed -i '/NODE_ENV/c NODE_ENV=production' .env"
+                    sh 'npm install'
+                }
+            }
+        }
+        // stage('Test') {
+        //     steps {
+        //         sh './jenkins/scripts/test.sh'
+        //     }
+        // }
+        stage('Deliver') {
+            steps {
+                sh' chmod 755 ./jenkins/scripts/deliver.sh'
+                sh './jenkins/scripts/deliver.sh'
+            }
+        }
+    }
+}

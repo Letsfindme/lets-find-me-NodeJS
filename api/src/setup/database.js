@@ -17,12 +17,13 @@ const connection = new Sequelize(
   {
     host: databaseConfigEnv.host,
     dialect: databaseConfigEnv.dialect,
-    logging: console.log
+    logging: console.log,
+    port:databaseConfigEnv.port
   }
 );
 
 // Test connection
-console.info("SETUP - Connecting database...");
+console.info("SETUP - Connecting database...",databaseConfigEnv.port);
 
 connection
   // .sync({
