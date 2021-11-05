@@ -1,0 +1,20 @@
+{
+  "development": {
+    "username": "letsfind",
+    "password": "letsfind",
+    "database": "app",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "seederStorage": "sequelize",
+    "port":"3306"
+  },
+  "production": {
+    "username": "letsfind",
+    "password": "letsfind",
+    "database": "app",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "seederStorage": "sequelize",
+    "port":"3303"
+  }
+}
