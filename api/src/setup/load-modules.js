@@ -19,7 +19,7 @@ const isAdmin = require("../middleware/is-admin");
 import { NODE_ENV } from "../config/env";
 
 // Load express modules
-export default function(server) {
+export default function (server) {
   console.info("SETUP - Loading modules...");
 
   // Enable CORS
@@ -32,6 +32,15 @@ export default function(server) {
   // Request body cookie parser
   server.use(cookieParser());
 
+  // apply the Content Security Policy (CSP)
+  server.use(function (req, res, next) {
+    res.setHeader(
+      "Content-Security-Policy",
+      "script-src 'self' default"
+    );
+    return next();
+  });
+
   // Static files folder
   server.use(
     "/public",
@@ -43,7 +52,7 @@ export default function(server) {
   // if (NODE_ENV === "development") {
   //   server.use(morgan("tiny"));
   // }
-  server.use(morgan("dev"))
+  server.use(morgan("dev"));
   // Load routers
   server.use("/feed", feedRoutes);
   server.use("/auth", authRoutes);
@@ -60,7 +69,7 @@ export default function(server) {
     const data = error.data;
     res.status(status).json({
       message: message,
-      data: data
+      data: data,
     });
   });
 }
