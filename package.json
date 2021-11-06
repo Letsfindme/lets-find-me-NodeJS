@@ -11,7 +11,7 @@
     "setup:db": "npm run db:migrate && npm run db:seed",
     "db:migrate": "./node_modules/.bin/sequelize db:migrate",
     "db:seed": "./node_modules/.bin/sequelize db:seed:all",
-    "start": "./node_modules/.bin/babel-node src/index.jsx",
+    "start": "babel-node src/index.js",
     "start:prod": "npm run build:prod && npm run start:server",
     "build:prod": "babel src -s -D -d build",
     "start:server": "forever start build/index.js"
@@ -20,14 +20,15 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "7.6.0",
-    "@babel/core": "7.6.0",
+    "@babel/core": "^7.6.0",
     "@babel/node": "7.6.1",
     "@babel/plugin-transform-runtime": "7.6.0",
     "@babel/preset-env": "7.6.0",
     "nodemon": "1.19.2"
   },
   "dependencies": {
-    "@babel/runtime": "7.6.0",
+    "@babel/cli": "7.6.0",
+    "@babel/core": "^7.6.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "chalk": "^3.0.0",
