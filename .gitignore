@@ -2,7 +2,7 @@ node_modules
 .idea/inspectionProfiles/
 api/build
 .idea/
-
+build/
 images/
 
 package-lock.json
