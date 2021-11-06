@@ -11,10 +11,14 @@
     "setup:db": "npm run db:migrate && npm run db:seed",
     "db:migrate": "./node_modules/.bin/sequelize db:migrate",
     "db:seed": "./node_modules/.bin/sequelize db:seed:all",
-    "start": "babel-node src/index.js",
     "start:prod": "npm run build:prod && npm run start:server",
     "build:prod": "babel src -s -D -d build",
-    "start:server": "forever start build/index.js"
+    "start:server": "forever start build/index.js",
+    "start": "npm run build",
+    "build": "npm run clean && npm run babel-build",
+    "babel-build": "babel -d ./build ./src -s",
+    "clean": "rm -rf ./build && mkdir build",
+    "heroku-postbuild": "npm install && npm run build"
   },
   "author": "Fadi NOUFAL",
   "license": "ISC",
@@ -29,6 +33,9 @@
   "dependencies": {
     "@babel/cli": "7.6.0",
     "@babel/core": "^7.6.0",
+    "@babel/node": "7.6.1",
+    "@babel/plugin-transform-runtime": "7.6.0",
+    "@babel/preset-env": "7.6.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "chalk": "^3.0.0",
