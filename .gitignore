@@ -2,9 +2,9 @@ node_modules
 .idea/inspectionProfiles/
 api/build
 .idea/
-
+build:
 images/
-
+dist/
 package-lock.json
 
 .vscode/settings.json
