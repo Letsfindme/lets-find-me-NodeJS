@@ -10,7 +10,7 @@ import databaseConfig from "../config/database.json";
 const databaseConfigEnv = databaseConfig[NODE_ENV];
 
 // Create new database connection for Heroku
-const connection = new Sequelize(process.env.DATABASE_URL, {
+const connection = new Sequelize(process.env.QOVERY_POSTGRESQL_Z9D227960_DATABASE_URL, {
   dialectOptions: {
     ssl: {
       require: true,
