@@ -2,7 +2,7 @@ const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 import models from "../setup/models";
-import serverConfig from "../config/server.json";
+// import serverConfig from "../config/server.json";
 
 exports.signup = (req, res, next) => {
   // const errors = validationResult(req);

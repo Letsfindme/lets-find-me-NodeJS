@@ -1,6 +1,6 @@
 // Imports
 import jwt from "jsonwebtoken";
-import serverConfig from "../config/server.json";
+// import serverConfig from "../config/server.json";
 import models from "../setup/models";
 
 // Authentication middleware

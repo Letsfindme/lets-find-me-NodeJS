@@ -5,7 +5,7 @@ var multer = require("multer");
 const uuidv4 = require("uuid/v4");
 import authentication from "../middleware/authentication";
 // App Imports
-import serverConfig from "../config/server.json";
+// import serverConfig from "../config/server.json";
 
 // File upload configurations and route
 export default function(server) {
