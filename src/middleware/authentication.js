@@ -13,7 +13,7 @@ module.exports = async (req, res, next) => {
         throw error;
       }
       const token = authToken.split(" ")[1];
-      req.userTok = jwt.verify(token, "serverConfig.secret");
+      req.userTok = jwt.verify(token, serverConfig.secret);
       
       req.userId = req.userTok.userId;
       req.user = await models.User.findByPk(req.userId, {
