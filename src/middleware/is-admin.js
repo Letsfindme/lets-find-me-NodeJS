@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 import models from "../setup/models";
-// import serverConfig from "../config/server.json";
+import serverConfig from "../config/server.json";
 
 module.exports = async (req, res, next) => {
   try {
