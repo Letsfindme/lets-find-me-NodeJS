@@ -91,7 +91,7 @@ exports.login = (req, res, next) => {
           type: loadedUser.role.type,
           credit: loadedUser.credit,
         },
-        serverConfig.secret,
+        "serverConfig.secret",
         {
           expiresIn: "240h"
         }

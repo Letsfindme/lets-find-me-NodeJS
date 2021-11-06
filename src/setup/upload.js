@@ -34,7 +34,7 @@ export default function(server) {
   }).array("file");
 
   // Upload route
-  server.post(serverConfig.upload.endpoint, (request, response) => {
+  server.post("/upload", (request, response) => {
     upload(request, response, function(error) {
       if (!error) {
         let fileNames = [];
