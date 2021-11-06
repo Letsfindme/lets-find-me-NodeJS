@@ -3,34 +3,34 @@ import { Sequelize } from "sequelize";
 import chalk from "chalk";
 
 // App Imports
-// import { NODE_ENV } from "../config/env";
-// import databaseConfig from "../config/database.json";
+import { NODE_ENV } from "../config/env";
+import databaseConfig from "../config/database.json";
 
 // Load database config
-// const databaseConfigEnv = databaseConfig[NODE_ENV];
+const databaseConfigEnv = databaseConfig[NODE_ENV];
 
 // Create new database connection for Heroku process.env.DATABASE_URL
-const connection = new Sequelize(process.env.DATABASE_URL, {
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
-  },
-});
+// const connection = new Sequelize(process.env.DATABASE_URL, {
+//   dialectOptions: {
+//     ssl: {
+//       require: true,
+//       rejectUnauthorized: false,
+//     },
+//   },
+// });
 
 // Create new database connection
-// const connection = new Sequelize(
-//   databaseConfigEnv.database,
-//   databaseConfigEnv.username,
-//   databaseConfigEnv.password,
-//   {
-//     host: databaseConfigEnv.host,
-//     dialect: databaseConfigEnv.dialect,
-//     logging: console.log,
-//     port: databaseConfigEnv.port,
-//   }
-// );
+const connection = new Sequelize(
+  databaseConfigEnv.database,
+  databaseConfigEnv.username,
+  databaseConfigEnv.password,
+  {
+    host: databaseConfigEnv.host,
+    dialect: databaseConfigEnv.dialect,
+    logging: console.log,
+    port: databaseConfigEnv.port,
+  }
+);
 
 // Test connection
 //console.info("SETUP - Connecting database...", databaseConfigEnv.port);
