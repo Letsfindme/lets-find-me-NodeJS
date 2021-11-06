@@ -3,11 +3,11 @@ import { Sequelize } from "sequelize";
 import chalk from "chalk";
 
 // App Imports
-import { NODE_ENV } from "../config/env";
-import databaseConfig from "../config/database.json";
+//import { NODE_ENV } from "../config/env";
+//import databaseConfig from "../config/database.json";
 
 // Load database config
-const databaseConfigEnv = databaseConfig[NODE_ENV];
+//const databaseConfigEnv = databaseConfig[NODE_ENV];
 
 // Create new database connection for Heroku
 const connection = new Sequelize(process.env.DATABASE_URL, {
@@ -33,7 +33,7 @@ const connection = new Sequelize(process.env.DATABASE_URL, {
 // );
 
 // Test connection
-console.info("SETUP - Connecting database...", databaseConfigEnv.port);
+//console.info("SETUP - Connecting database...", databaseConfigEnv.port);
 
 connection
   // .sync({
